@@ -1,6 +1,6 @@
 # Movie Database & Index Performance Demo
 
-![CI](https://github.com/dagron27/CSCI411-Project/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/dagron27/movie-database-indexed/actions/workflows/ci.yml/badge.svg)
 
 **Course:** `CSCI 411, Database Theory and Design, Fall 2025`
 
