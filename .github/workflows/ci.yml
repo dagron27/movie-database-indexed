@@ -1,0 +1,73 @@
+name: CI
+
+# Run on every push, regardless of branch name, and allow manual runs from
+# the Actions tab. No branch filter is used so this works no matter what the
+# eventual default branch is called.
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-and-smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository contents so later steps can access the code.
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Install a current Python 3 interpreter for all subsequent steps.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Install the project's only external dependency (Flask), as documented
+      # in the README Environment Setup section.
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Byte-compile every tracked Python file to catch syntax errors early.
+      # This covers the root-level app and query-toolkit, including
+      # query-toolkit/main.py, since py_compile only parses/compiles the
+      # file and does not execute it - so the documented ImportError in
+      # query-toolkit/main.py (see README Known Issues > Dead Code) will
+      # not surface here.
+      - name: Compile-check all Python files
+        run: |
+          python -m py_compile \
+            src/app.py \
+            src/db_utils.py \
+            src/search_movies.py \
+            src/random_data.py \
+            query-toolkit/main.py \
+            query-toolkit/populate_db.py
+
+      # Start the Flask app in the background. debug=False (already set in
+      # app.py) means app.run() does not use the reloader, so it will not
+      # fork/block startup. Note: this step intentionally does NOT run
+      # query-toolkit/main.py - that script has a known, documented,
+      # out-of-scope ImportError (see README Known Issues > Dead Code)
+      # unrelated to the Flask app and is expected to fail if invoked, so
+      # it is excluded from this workflow entirely. Run from the repo root
+      # (not `cd src`) so
+      # app.py's `sqlite3.connect('data/new_movies.db')` calls resolve
+      # correctly; Flask's own template/static discovery is independent of
+      # the working directory (it follows app.py's own file location).
+      - name: Start Flask app
+        run: |
+          python src/app.py &
+          echo "Waiting for the Flask dev server to bind..."
+          sleep 3
+
+      # Flask's development server binds to 127.0.0.1:5000 by default (no
+      # host/port arguments are passed to app.run() in app.py). Fail the job
+      # if the root route does not respond successfully.
+      - name: Smoke test root route
+        run: curl -f http://127.0.0.1:5000/
+
+      # Stop the background Flask process so the job does not leave it
+      # running after the workflow completes.
+      - name: Stop Flask app
+        if: always()
+        run: pkill -f "python src/app.py" || true

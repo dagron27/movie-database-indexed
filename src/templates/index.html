@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Database</title>
+</head>
+<body>
+    <h1>Welcome to the Movie Database</h1>
+
+    <h2>Add Genre</h2>
+    <form action="/add_genre" method="POST">
+        <button type="submit">Add Random Genre</button>
+    </form>
+    
+    {% if add_genre_message %} 
+        <p>{{ add_genre_message }}</p> 
+    {% endif %}
+    
+    <h2>Add Director</h2>
+    <form action="/add_director" method="POST">
+        <button type="submit">Add Random Director</button>
+    </form>
+
+    {% if add_director_message %} 
+        <p>{{ add_director_message }}</p> 
+    {% endif %}
+
+    <h2>Add Actor</h2>
+    <form action="/add_actor" method="POST">
+        <button type="submit">Add Random Actor</button>
+    </form>
+    
+    {% if add_actor_message %} 
+        <p>{{ add_actor_message }}</p> 
+    {% endif %}
+ 
+    <h2>Add Multiple Movies</h2>
+    <form action="/add_movies" method="POST">
+        <label for="num_movies">Number of Movies:</label>
+        <input type="number" id="num_movies" name="num_movies" required>
+        <button type="submit">Generate Movies</button>
+    </form>
+    
+    {% if add_movie_message %} 
+        <p>{{ add_movie_message }}</p> 
+    {% endif %}
+
+    <h2>Search Movies by Year</h2>
+    <form action="/search_by_year" method="POST">
+        <label for="year">Year:</label>
+        <input type="number" id="year" name="year" required>
+        <button type="submit">Search</button>
+    </form>
+    
+    {% if search_year_message %}
+        <p style="white-space: pre-line">{{ search_year_message }}</p>
+    {% endif %}
+
+    <h2>Search Movies by Year Range</h2>
+    <form action="/search_by_year_range" method="POST">
+        <label for="start_year">Start Year:</label>
+        <input type="number" id="start_year" name="start_year" required>
+        <label for="end_year">End Year:</label>
+        <input type="number" id="end_year" name="end_year" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if search_year_range_message %}
+        <p style="white-space: pre-line">{{ search_year_range_message }}</p>
+    {% endif %}
+
+    <h2>Manage Index</h2> 
+    <form action="/add_index" method="POST"> 
+        <button type="submit">Create Index</button> 
+    </form> <form action="/drop_index" method="POST"> 
+        <button type="submit">Drop Index</button> </form>
+
+    {% if index_message %} 
+        <p>{{ index_message }}</p> 
+    {% endif %}
+
+</body>
+</html>
